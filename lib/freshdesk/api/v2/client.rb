@@ -3,9 +3,12 @@ module Freshdesk
     module V2
       class Client
 
-        PATH = "api/v2/"
-        COMPANIES = "companies"
-        CONTACTS = "contacts"
+        PATH = "api/v2/".freeze
+        COMPANIES = "companies".freeze
+        CONTACTS = "contacts".freeze
+
+        DEFAULT_PAGE_NUMBER = 1
+        DEFAULT_PER_PAGE = 100
 
         def initialize(base_url, api_key)
           @connection = Freshdesk::Api::V2::Connection.new(base_url, api_key)
@@ -13,9 +16,7 @@ module Freshdesk
 
         #Contacts
         def get_contacts(args={})
-          wrapped_in_json do
-            @connection.get(CONTACTS, args)
-          end
+          paged_get(CONTACTS, args)
         end
 
         def find_contact_by_id(id)
@@ -38,9 +39,7 @@ module Freshdesk
 
         #Companies
         def get_companies(args={})
-          wrapped_in_json do
-            @connection.get(COMPANIES, args)
-          end
+          paged_get(COMPANIES, args)
         end
 
         def find_company_by_id(id)
@@ -62,6 +61,23 @@ module Freshdesk
         end
 
         private
+
+          def paged_get(endpoint, args={})
+            items = []
+            link = nil
+            page = args.delete(:page) || DEFAULT_PER_PAGE
+            per_page = args.delete(:per_page) || DEFAULT_PAGE_NUMBER
+            begin
+              response = @connection.get(
+                endpoint,
+                args.merge(page: page, per_page: per_page)
+              )
+              link = response.headers["link"]
+              page += 1
+              items += JSON.parse(response)
+            end until link.nil?
+            items
+          end
 
           def wrapped_in_json(&block)
             result = block.call

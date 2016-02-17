@@ -51,9 +51,9 @@ module Freshdesk
 
         private
 
-          def with_exception_handling(&block)
+          def with_exception_handling
             begin
-              block.call
+              yield if block_given?
             rescue RestClient::UnprocessableEntity
               raise AlreadyExistedError, "Entity already exists"
             rescue RestClient::InternalServerError
