@@ -55,11 +55,11 @@ module Freshdesk
             begin
               yield if block_given?
             rescue RestClient::UnprocessableEntity
-              raise AlreadyExistedError, "Entity already exists"
+              raise Freshdesk::Api::V2::AlreadyExistsError, "Entity already exists"
             rescue RestClient::InternalServerError
-              raise ConnectionError, "Connection to the server failed."
+              raise Freshdesk::Api::V2::ConnectionError, "Connection to the server failed."
             rescue RestClient::Found
-              raise ConnectionError, "Connection to the server failed. Please check username/password"
+              raise Freshdesk::Api::V2::ConnectionError, "Connection to the server failed. Please check username/password"
             rescue Exception
               raise
             end

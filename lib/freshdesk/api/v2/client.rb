@@ -65,8 +65,8 @@ module Freshdesk
           def paged_get(endpoint, args={})
             items = []
             link = nil
-            page = args.delete(:page) || DEFAULT_PER_PAGE
-            per_page = args.delete(:per_page) || DEFAULT_PAGE_NUMBER
+            page = args.delete(:page) || DEFAULT_PAGE_NUMBER
+            per_page = args.delete(:per_page) || DEFAULT_PER_PAGE
             begin
               response = @connection.get(
                 endpoint,
